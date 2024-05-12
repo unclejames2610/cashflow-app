@@ -9,7 +9,12 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      backgroundImage: {},
+      backgroundImage: {
+        bgImage: "url('../../public/assets/loginImage.svg')",
+      },
+      colors: {
+        "primary-green": "#107137",
+      },
     },
   },
   plugins: [],
