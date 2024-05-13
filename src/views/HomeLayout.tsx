@@ -15,8 +15,8 @@ const HomeLayout: FC<{ children: ReactNode }> = ({ children }) => {
       <div className="fixed top-16 bottom-0 h-full">
         <Sidebar pathname={pathname} />
       </div>
-      <div className="w-full lg:ml-56 mt-16">
-        <div className="w-full h-full">{children}</div>
+      <div className=" lg:ml-56 mt-16">
+        <div className=" h-full">{children}</div>
       </div>
     </div>
   );
