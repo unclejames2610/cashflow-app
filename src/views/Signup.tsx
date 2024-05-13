@@ -1,15 +1,16 @@
 "use client";
+import Button from "@/components/Button";
+import LoginInput from "@/components/LoginInput";
 import Image from "next/image";
+import Link from "next/link";
 import React, { useState } from "react";
 import logo from "../../public/assets/logo.svg";
-import loginImage from "../../public/assets/loginImage.svg";
-import LoginInput from "@/components/LoginInput";
-import Button from "@/components/Button";
-import Link from "next/link";
 
-const Login = () => {
+const Signup = () => {
   const [email, setEmail] = useState<string | undefined>();
   const [password, setPassword] = useState<string | undefined>();
+  const [fullname, setFullname] = useState<string | undefined>();
+  const [retypePassword, setRetypePassword] = useState<string | undefined>();
   return (
     <div className="flex lg:justify-between h-screen mx-auto lg:items-center">
       {/* column one */}
@@ -33,15 +34,15 @@ const Login = () => {
         </div>
         <div className="h-[100%] w-full bg-cover bg-bgImage bg-no-repeat"></div>
         {/* <div className="relative h-full w-full md:h-full md:w-full ">
-          <Image
-            src={loginImage}
-            alt="logo"
-            fill={true}
-            priority
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className="object-contain"
-          />
-        </div> */}
+        <Image
+          src={loginImage}
+          alt="logo"
+          fill={true}
+          priority
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className="object-contain"
+        />
+      </div> */}
       </div>
 
       {/* column two */}
@@ -64,10 +65,20 @@ const Login = () => {
           </p>
         </div>
         <h4 className="font-semibold text-lg md:text-2xl text-primary-green">
-          Welcome Back!
+          Create Account
         </h4>
         <div className="flex flex-col gap-2">
           <form className="flex flex-col gap-4 w-full lg:w-[350px]">
+            {/* full name */}
+            <LoginInput
+              name="fullName"
+              value={fullname!!}
+              onChange={(e) => setFullname(e.target.value)}
+              placeholder="Enter your name"
+              type="text"
+              label="Full Name"
+            />
+
             {/* email */}
             <LoginInput
               name="email"
@@ -87,13 +98,22 @@ const Login = () => {
               label="Password"
             />
 
-            <Button text="Login" />
+            <LoginInput
+              name="retypePassword"
+              value={retypePassword!!}
+              onChange={(e) => setRetypePassword(e.target.value)}
+              placeholder="Re-enter your password"
+              type="password"
+              label="Re-Type Password"
+            />
+
+            <Button text="Sign Up" />
           </form>
 
           <div className="text-gray-500 ">
-            Don't Have An Account?{" "}
-            <Link href="/signup" className="text-primary-green hover:underline">
-              Sign up
+            Already Have An Account?{" "}
+            <Link href="/" className="text-primary-green hover:underline">
+              Login
             </Link>
           </div>
         </div>
@@ -102,4 +122,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Signup;
