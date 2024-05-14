@@ -70,7 +70,7 @@ const Dashboard = () => {
                 </div>
 
                 {/* legend */}
-                <div className="flex flex-col justify-between lg:h-64 md:h-[250px] gap-2">
+                <div className="flex flex-col justify-between lg:h-64 md:h-[250px] gap-2 w-full">
                   <div className="flex items-center gap-3">
                     <span className="rounded-full h-4 w-4 bg-[#357DA0]"></span>
                     Feeding
