@@ -17,7 +17,7 @@ export const options = {
       //   text: "Total Revenue",
     },
   },
-  cutout: "35%",
+  // cutout: "35%",
 };
 
 export const data = {
