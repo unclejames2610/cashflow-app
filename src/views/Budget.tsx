@@ -1,11 +1,12 @@
 "use client";
 import BudgetList from "@/components/budgetComponents/BudgetList";
+import BudgetTable from "@/components/budgetComponents/BudgetTable";
 import React, { useState } from "react";
 
 const Budget = () => {
   const [month, setMonth] = useState("April");
   return (
-    <div className="flex flex-col min-h-screen gap-4 mx-auto p-4">
+    <div className="flex flex-col min-h-screen gap-4 mx-auto p-4 bg-background">
       {/* header */}
       <div className="flex justify-between w-full gap-4">
         <h4 className="text-lg md:text-2xl text-primary-green font-semibold">
@@ -25,9 +26,9 @@ const Budget = () => {
         </select>
       </div>
 
-      <div className="flex gap-6 lg:justify-between lg:flex-row flex-col">
+      <div className="flex gap-6 lg:justify-between lg:flex-row flex-col h-[600px]">
         {/* 1st column */}
-        <div className="bg-white shadow-md rounded-lg flex flex-col gap-2 px-2 py-4 lg:w-[40%] h-full">
+        <div className="bg-white shadow-md rounded-lg flex flex-col gap-2 px-2 py-4 lg:w-[40%] flex-grow h-full">
           <div className="flex justify-between w-full gap-6">
             <p>Budget Folder</p>
             <p className="text-primary-green underline cursor-pointer">
@@ -41,7 +42,9 @@ const Budget = () => {
         </div>
 
         {/* 2nd column */}
-        <div className="bg-white shadow-md rounded-lg flex flex-col gap-2 px-2 py-4 lg"></div>
+        <div className="bg-white shadow-md rounded-lg flex flex-col gap-2 px-3 py-6 lg:w-[60%] flex-grow h-full">
+          <BudgetTable />
+        </div>
       </div>
     </div>
   );
