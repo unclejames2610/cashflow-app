@@ -1,11 +1,16 @@
 "use client";
-import React, { useState } from "react";
+import React, { Dispatch, FC, SetStateAction, useState } from "react";
 import { RiSearchEyeLine } from "react-icons/ri";
 import { MdOutlineEdit } from "react-icons/md";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { FiTrash2 } from "react-icons/fi";
 
-const BudgetTable = () => {
+interface BudgetTableProps {
+  addExpense: boolean;
+  setAddExpense: Dispatch<SetStateAction<boolean>>;
+}
+
+const BudgetTable: FC<BudgetTableProps> = ({ addExpense, setAddExpense }) => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const handleSearch = () => {};
 
@@ -59,7 +64,10 @@ const BudgetTable = () => {
           />
         </div>
 
-        <button className="text-white bg-primary-green p-3 text-sm rounded-md shadow-md">
+        <button
+          className="text-white bg-primary-green p-3 text-sm rounded-md shadow-md"
+          onClick={() => setAddExpense(true)}
+        >
           Add Expenses
         </button>
       </div>

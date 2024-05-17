@@ -1,8 +1,17 @@
-import React, { FC } from "react";
+import React, { FC, MouseEventHandler } from "react";
 
-const BasicButton: FC<{ text: string }> = ({ text }) => {
+const BasicButton: FC<{
+  text: string;
+  notFull?: boolean;
+  onClick?: MouseEventHandler<HTMLButtonElement>;
+}> = ({ text, notFull, onClick }) => {
   return (
-    <button className="text-white bg-primary-green p-3 text-xs md:text-sm rounded-md shadow-md lg:w-36">
+    <button
+      className={`text-white bg-primary-green p-3 text-xs md:text-sm rounded-md shadow-md ${
+        notFull ? "" : "w-full"
+      }  lg:w-36`}
+      onClick={onClick}
+    >
       {text}
     </button>
   );
