@@ -3,14 +3,74 @@ import Button from "@/components/Button";
 import LoginInput from "@/components/LoginInput";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { FormEvent, useState } from "react";
 import logo from "../../public/assets/logo.svg";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { app } from "@/config/firebaseConfig";
+import LoaderSmall from "@/components/LoaderSmall";
 
 const Signup = () => {
-  const [email, setEmail] = useState<string | undefined>();
-  const [password, setPassword] = useState<string | undefined>();
-  const [fullname, setFullname] = useState<string | undefined>();
-  const [retypePassword, setRetypePassword] = useState<string | undefined>();
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [fullname, setFullname] = useState<string>("");
+  const [retypePassword, setRetypePassword] = useState<string>("");
+  const [passwordError, setPasswordError] = useState(false);
+  const [errorText, setErrorText] = useState<string>("");
+  const auth = getAuth(app);
+  const [emptyError, setEmptyError] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const [success, setSuccess] = useState(false);
+
+  const signUp = async (e: FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setPasswordError(false);
+    setError(false);
+    setEmptyError(false);
+    setErrorText("");
+    setSuccess(false);
+    if (
+      email.length === 0 ||
+      password.length === 0 ||
+      fullname.length === 0 ||
+      retypePassword.length === 0
+    ) {
+      setEmptyError(true);
+      setErrorText("Please fill in all required fields");
+      setLoading(false);
+
+      setError(false);
+    } else if (password !== retypePassword) {
+      setPasswordError(true);
+      setErrorText("Passwords do not match");
+      setLoading(false);
+    } else {
+      await createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          // Signed up
+          const user = userCredential.user;
+          setLoading(false);
+          setEmail("");
+          setFullname("");
+          setPassword("");
+          setRetypePassword("");
+          setSuccess(true);
+          // ...
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          // console.log(error.message);
+          setLoading(false);
+          setError(true);
+          setErrorText(error.message);
+          setSuccess(false);
+          // ..
+        });
+    }
+  };
+
   return (
     <div className="flex lg:justify-between h-screen mx-auto lg:items-center">
       {/* column one */}
@@ -67,12 +127,28 @@ const Signup = () => {
         <h4 className="font-semibold text-lg md:text-2xl text-primary-green">
           Create Account
         </h4>
-        <div className="flex flex-col gap-2">
-          <form className="flex flex-col gap-4 w-full lg:w-[350px]">
+        <div className="flex flex-col gap-2 pb-8">
+          {(error === true ||
+            passwordError === true ||
+            emptyError === true) && (
+            <p className="text-xs md:text-sm font-medium text-red-600 text-center">
+              {errorText}
+            </p>
+          )}
+
+          {success === true && (
+            <p className="text-xs md:text-sm font-medium text-primary-green text-center">
+              User Created Successfully
+            </p>
+          )}
+          <form
+            className="flex flex-col gap-4 w-full lg:w-[350px]"
+            onSubmit={(e) => signUp(e)}
+          >
             {/* full name */}
             <LoginInput
-              name="fullName"
-              value={fullname!!}
+              name="name"
+              value={fullname}
               onChange={(e) => setFullname(e.target.value)}
               placeholder="Enter your name"
               type="text"
@@ -82,7 +158,7 @@ const Signup = () => {
             {/* email */}
             <LoginInput
               name="email"
-              value={email!!}
+              value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
               type="email"
@@ -91,7 +167,7 @@ const Signup = () => {
 
             <LoginInput
               name="password"
-              value={password!!}
+              value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
               type="password"
@@ -100,14 +176,17 @@ const Signup = () => {
 
             <LoginInput
               name="retypePassword"
-              value={retypePassword!!}
+              value={retypePassword}
               onChange={(e) => setRetypePassword(e.target.value)}
               placeholder="Re-enter your password"
               type="password"
               label="Re-Type Password"
             />
 
-            <Button text="Sign Up" />
+            <Button
+              text={loading ? <LoaderSmall /> : "Sign Up"}
+              type="submit"
+            />
           </form>
 
           <div className="text-gray-500 ">

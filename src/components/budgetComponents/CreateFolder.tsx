@@ -5,6 +5,8 @@ import correct from "../../../public/assets/correct.png";
 import BasicButton from "../BasicButton";
 import Loader from "../Loader";
 import LoginInput from "../LoginInput";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { db } from "@/config/firebaseConfig";
 
 interface CreateFolderProps {
   createFolderActive: boolean;
@@ -24,7 +26,7 @@ const CreateFolder: FC<CreateFolderProps> = ({
   const [loading, setLoading] = useState(false);
   const [folderName, setFolderName] = useState<string>("");
   const [income, setIncome] = useState<string>("");
-  const [month, setMonth] = useState<string>("");
+  const [month, setMonth] = useState<string>("January");
 
   const months = [
     "January",
@@ -40,6 +42,37 @@ const CreateFolder: FC<CreateFolderProps> = ({
     "November",
     "December",
   ];
+
+  const onSubmit = async () => {
+    setError(false);
+    setLoading(true);
+    setEmptyError(false);
+
+    if (folderName.length === 0 || income.length === 0) {
+      setEmptyError(true);
+      setLoading(false);
+    } else {
+      try {
+        const docRef = doc(db, "budgetFolder", folderName);
+        const res = await getDoc(docRef);
+        if (!res.exists()) {
+          await setDoc(doc(db, "budgetFolder", folderName), {
+            name: folderName,
+            income: income,
+            month: month,
+            date: new Date(),
+            expenses: [],
+          });
+          setSuccess(true);
+          setLoading(false);
+        }
+      } catch (error) {
+        console.log(error);
+        setError(true);
+        setLoading(false);
+      }
+    }
+  };
   return (
     <div
       className={`mx-auto w-[90%] md:w-[50%] lg:w-[40%] h-fit gap-12 flex flex-col  z-20`}
@@ -134,7 +167,7 @@ const CreateFolder: FC<CreateFolderProps> = ({
 
           {error === true && (
             <div className="flex items-center justify-center h-full -mt-4 w-full">
-              <p className="text-sm text-center text-error-red mt-4">
+              <p className="text-sm text-center text-red-600 mt-4">
                 An error occured, could not create folder
               </p>
             </div>
@@ -142,7 +175,7 @@ const CreateFolder: FC<CreateFolderProps> = ({
 
           {emptyError === true && (
             <div className="flex items-center justify-center h-full -mt-4 w-full">
-              <p className="text-xs md:text-sm text-center text-error-red mt-4">
+              <p className="text-xs md:text-sm text-center text-red-600 mt-4">
                 Please, fill in all required fields
               </p>
             </div>
@@ -154,7 +187,7 @@ const CreateFolder: FC<CreateFolderProps> = ({
             </div>
           ) : (
             <div className="w-full mt-4 mx-auto flex justify-center">
-              <BasicButton text="Create" />
+              <BasicButton text="Create" onClick={() => onSubmit()} />
             </div>
           )}
         </div>

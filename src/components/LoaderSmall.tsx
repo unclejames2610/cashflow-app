@@ -1,15 +1,14 @@
-"use client";
 import React from "react";
 import { ThreeDots } from "react-loader-spinner";
 
-const Loader = () => {
+const LoaderSmall = () => {
   return (
-    <div>
+    <div className="flex items-center justify-center h-full">
       <ThreeDots
         visible={true}
-        height="80"
-        width="80"
-        color="#107137"
+        height="50"
+        width="50"
+        color="#ffffff"
         radius="9"
         ariaLabel="three-dots-loading"
         wrapperStyle={{}}
@@ -19,4 +18,4 @@ const Loader = () => {
   );
 };
 
-export default Loader;
+export default LoaderSmall;

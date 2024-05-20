@@ -1,15 +1,74 @@
 "use client";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { FormEvent, useState } from "react";
 import logo from "../../public/assets/logo.svg";
 import loginImage from "../../public/assets/loginImage.svg";
 import LoginInput from "@/components/LoginInput";
 import Button from "@/components/Button";
 import Link from "next/link";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { app } from "@/config/firebaseConfig";
+import { useRouter } from "next/navigation";
 
 const Login = () => {
-  const [email, setEmail] = useState<string | undefined>();
-  const [password, setPassword] = useState<string | undefined>();
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [passwordError, setPasswordError] = useState(false);
+  const [errorText, setErrorText] = useState<string>("");
+  const auth = getAuth(app);
+  const [emptyError, setEmptyError] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const [success, setSuccess] = useState(false);
+
+  const router = useRouter();
+
+  const signIn = async (e: FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setPasswordError(false);
+    setError(false);
+    setEmptyError(false);
+    setErrorText("");
+    setSuccess(false);
+    if (email.length === 0 || password.length === 0) {
+      setEmptyError(true);
+      setErrorText("Please fill in all required fields");
+      setLoading(false);
+
+      setError(false);
+    } else {
+      await signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          // Signed up
+          const user = userCredential.user;
+          setLoading(false);
+          setEmail("");
+
+          setPassword("");
+
+          setSuccess(true);
+          router.push("/home");
+
+          // ...
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          // console.log(error.message);
+          setLoading(false);
+          setError(true);
+          setErrorText(error.message);
+          setSuccess(false);
+          // ..
+        });
+    }
+  };
+
   return (
     <div className="flex lg:justify-between h-screen mx-auto lg:items-center">
       {/* column one */}
@@ -67,7 +126,21 @@ const Login = () => {
           Welcome Back!
         </h4>
         <div className="flex flex-col gap-2">
-          <form className="flex flex-col gap-4 w-full lg:w-[350px]">
+          {(error === true || emptyError === true) && (
+            <p className="text-xs md:text-sm font-medium text-red-600 text-center">
+              {errorText}
+            </p>
+          )}
+
+          {/* {success === true && (
+            <p className="text-xs md:text-sm font-medium text-primary-green text-center">
+              User Created Successfully
+            </p>
+          )} */}
+          <form
+            className="flex flex-col gap-4 w-full lg:w-[350px]"
+            onSubmit={(e) => signIn(e)}
+          >
             {/* email */}
             <LoginInput
               name="email"
@@ -87,7 +160,7 @@ const Login = () => {
               label="Password"
             />
 
-            <Button text="Login" />
+            <Button text="Login" type="submit" />
           </form>
 
           <div className="text-gray-500 ">

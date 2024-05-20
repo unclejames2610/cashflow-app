@@ -3,7 +3,15 @@ import AddExpense from "@/components/budgetComponents/AddExpense";
 import BudgetList from "@/components/budgetComponents/BudgetList";
 import BudgetTable from "@/components/budgetComponents/BudgetTable";
 import CreateFolder from "@/components/budgetComponents/CreateFolder";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  onSnapshot,
+} from "firebase/firestore";
+import { db } from "@/config/firebaseConfig";
 
 const Budget = () => {
   const [month, setMonth] = useState("April");
@@ -11,6 +19,20 @@ const Budget = () => {
   const [success, setSuccess] = useState(false);
   const [addExpense, setAddExpense] = useState(false);
   const [currentFolder, setCurrentFolder] = useState("");
+
+  const [budgetFolders, setBudgetFolders] = useState([]);
+
+  useEffect(() => {
+    const fetchBudget = async () => {
+      const querySnapshot = await getDocs(collection(db, "budgetFolder"));
+      querySnapshot.forEach((doc) => {
+        // doc.data() is never undefined for query doc snapshots
+        console.log(doc.id, " => ", doc.data());
+      });
+    };
+
+    fetchBudget();
+  }, [success]);
   return (
     <div className="flex flex-col min-h-screen gap-4 mx-auto  bg-background relative">
       {createFolderActive && (
