@@ -12,6 +12,9 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
+import { BudgetModel } from "../../utils/types";
+import { formatDateAndTime } from "../../utils/helperMethods";
+import NoEntries from "@/components/NoEntries";
 
 const Budget = () => {
   const [month, setMonth] = useState("April");
@@ -20,15 +23,20 @@ const Budget = () => {
   const [addExpense, setAddExpense] = useState(false);
   const [currentFolder, setCurrentFolder] = useState("");
 
-  const [budgetFolders, setBudgetFolders] = useState([]);
+  const [budgetFolders, setBudgetFolders] = useState<BudgetModel[] | undefined>(
+    []
+  );
 
   useEffect(() => {
     const fetchBudget = async () => {
       const querySnapshot = await getDocs(collection(db, "budgetFolder"));
+      const fetchedFolders: BudgetModel[] = [];
       querySnapshot.forEach((doc) => {
         // doc.data() is never undefined for query doc snapshots
         console.log(doc.id, " => ", doc.data());
+        fetchedFolders.push(doc.data() as BudgetModel);
       });
+      setBudgetFolders(fetchedFolders);
     };
 
     fetchBudget();
@@ -84,7 +92,7 @@ const Budget = () => {
         </select>
       </div>
 
-      <div className="flex gap-6 lg:justify-between lg:flex-row flex-col h-[600px] p-4">
+      <div className="flex gap-6 lg:justify-between lg:flex-row flex-col lg:h-[600px] p-4">
         {/* 1st column */}
         <div className="bg-white shadow-md rounded-lg flex flex-col gap-2 px-2 py-4 lg:w-[40%] flex-grow h-full">
           <div className="flex justify-between w-full gap-6">
@@ -96,14 +104,23 @@ const Budget = () => {
               Create Folder
             </p>
           </div>
-
-          <BudgetList text="Personal Needs" date="04/04/24" />
-          <BudgetList text="Personal Needs" date="04/04/24" />
-          <BudgetList text="Personal Needs" date="04/04/24" />
+          {budgetFolders?.length === 0 ? (
+            <div className="flex py-12 justify-center items-center h-full w-full">
+              <NoEntries />
+            </div>
+          ) : (
+            budgetFolders?.map((folder, index) => (
+              <BudgetList
+                key={index}
+                text={folder.name}
+                date={new Date(folder.date).toLocaleDateString()}
+              />
+            ))
+          )}
         </div>
 
         {/* 2nd column */}
-        <div className="bg-white shadow-md rounded-lg flex flex-col gap-2 px-3 py-6 lg:w-[60%] flex-grow h-full">
+        <div className="bg-white shadow-md rounded-lg flex flex-col gap-2 px-3 py-6 lg:w-[60%] h-full">
           <BudgetTable addExpense={addExpense} setAddExpense={setAddExpense} />
         </div>
       </div>

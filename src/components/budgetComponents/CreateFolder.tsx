@@ -26,9 +26,10 @@ const CreateFolder: FC<CreateFolderProps> = ({
   const [loading, setLoading] = useState(false);
   const [folderName, setFolderName] = useState<string>("");
   const [income, setIncome] = useState<string>("");
-  const [month, setMonth] = useState<string>("January");
+  const [month, setMonth] = useState<string>("Select Month");
 
   const months = [
+    "Select Month",
     "January",
     "February",
     "March",
@@ -60,7 +61,7 @@ const CreateFolder: FC<CreateFolderProps> = ({
             name: folderName,
             income: income,
             month: month,
-            date: new Date(),
+            date: new Date().toString(),
             expenses: [],
           });
           setSuccess(true);
