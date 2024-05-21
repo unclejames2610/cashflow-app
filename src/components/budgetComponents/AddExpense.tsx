@@ -1,7 +1,11 @@
+"use client";
+import { db } from "@/config/firebaseConfig";
+import { arrayUnion, doc, getDoc, updateDoc } from "firebase/firestore";
 import Image from "next/image";
 import React, { Dispatch, FC, SetStateAction, useState } from "react";
 import { FaX } from "react-icons/fa6";
 import correct from "../../../public/assets/correct.png";
+import { BudgetModel } from "../../../utils/types";
 import BasicButton from "../BasicButton";
 import Loader from "../Loader";
 import LoginInput from "../LoginInput";
@@ -11,7 +15,8 @@ interface AddExpenseProps {
   setAddExpense: Dispatch<SetStateAction<boolean>>;
   success: boolean;
   setSuccess: Dispatch<SetStateAction<boolean>>;
-  currentFolder: string;
+  budgetName: string;
+  setCurrentFolder: Dispatch<SetStateAction<BudgetModel | undefined>>;
 }
 
 const AddExpense: FC<AddExpenseProps> = ({
@@ -19,7 +24,8 @@ const AddExpense: FC<AddExpenseProps> = ({
   setAddExpense,
   success,
   setSuccess,
-  currentFolder,
+  budgetName,
+  setCurrentFolder,
 }) => {
   const [error, setError] = useState(false);
   const [emptyError, setEmptyError] = useState(false);
@@ -28,6 +34,44 @@ const AddExpense: FC<AddExpenseProps> = ({
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [date, setDate] = useState("");
+
+  const onSubmit = async () => {
+    setLoading(true);
+    setError(false);
+    setEmptyError(false);
+    if (
+      category.length === 0 ||
+      amount.length === 0 ||
+      description.length === 0 ||
+      date.length === 0
+    ) {
+      setEmptyError(true);
+    } else {
+      try {
+        const docRef = doc(db, "budgetFolder", budgetName);
+        const res = await getDoc(docRef);
+        if (res.exists()) {
+          await updateDoc(docRef, {
+            expense: arrayUnion({
+              category: category,
+              amount: amount,
+              description: description,
+              date: date,
+            }),
+          });
+          setSuccess(true);
+
+          // After successful update, fetch the updated document to ensure currentFolder reflects the change
+          const updatedDocSnap = await getDoc(docRef);
+          const updatedFolderData = updatedDocSnap.data() as BudgetModel;
+          setCurrentFolder(updatedFolderData);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
   return (
     <div
       className={`mx-auto w-[90%] md:w-[50%] lg:w-[40%] h-fit gap-12 flex flex-col  z-20`}
@@ -82,7 +126,7 @@ const AddExpense: FC<AddExpenseProps> = ({
             </div>
 
             <p className="text-xs md:text-sm text-gray-400 text-center w-full -mt-4">
-              Folder Name: {currentFolder}
+              Folder Name: {budgetName}
             </p>
           </div>
 
@@ -115,7 +159,7 @@ const AddExpense: FC<AddExpenseProps> = ({
           />
 
           <LoginInput
-            type="text"
+            type="datetime-local"
             label="Date"
             placeholder="Enter Date"
             name="date"
@@ -145,7 +189,7 @@ const AddExpense: FC<AddExpenseProps> = ({
             </div>
           ) : (
             <div className="w-full mt-4 mx-auto flex justify-center">
-              <BasicButton text="Add" />
+              <BasicButton text="Add" onClick={() => onSubmit()} />
             </div>
           )}
         </div>

@@ -21,11 +21,14 @@ const Budget = () => {
   const [createFolderActive, setCreateFolderActive] = useState(false);
   const [success, setSuccess] = useState(false);
   const [addExpense, setAddExpense] = useState(false);
-  const [currentFolder, setCurrentFolder] = useState("");
+  const [currentFolder, setCurrentFolder] = useState<BudgetModel | undefined>();
 
   const [budgetFolders, setBudgetFolders] = useState<BudgetModel[] | undefined>(
     []
   );
+
+  const [budgetSelect, setBudgetSelect] = useState<boolean>(false);
+  const [budgetName, setBudgetName] = useState<string>("");
 
   useEffect(() => {
     const fetchBudget = async () => {
@@ -33,7 +36,7 @@ const Budget = () => {
       const fetchedFolders: BudgetModel[] = [];
       querySnapshot.forEach((doc) => {
         // doc.data() is never undefined for query doc snapshots
-        console.log(doc.id, " => ", doc.data());
+        console.log(doc.data());
         fetchedFolders.push(doc.data() as BudgetModel);
       });
       setBudgetFolders(fetchedFolders);
@@ -41,6 +44,9 @@ const Budget = () => {
 
     fetchBudget();
   }, [success]);
+
+  console.log("success", success);
+  console.log(currentFolder);
   return (
     <div className="flex flex-col min-h-screen gap-4 mx-auto  bg-background relative">
       {createFolderActive && (
@@ -65,11 +71,12 @@ const Budget = () => {
       {addExpense && (
         <div className="absolute z-20 inset-0 flex mt-4">
           <AddExpense
-            currentFolder={currentFolder}
+            budgetName={budgetName}
             addExpense={addExpense}
             setAddExpense={setAddExpense}
             setSuccess={setSuccess}
             success={success}
+            setCurrentFolder={setCurrentFolder}
           />
         </div>
       )}
@@ -114,6 +121,12 @@ const Budget = () => {
                 key={index}
                 text={folder.name}
                 date={new Date(folder.date).toLocaleDateString()}
+                onClick={() => {
+                  setBudgetName(folder.name);
+                  setBudgetSelect(true);
+                  setCurrentFolder(folder);
+                }}
+                budgetName={budgetName}
               />
             ))
           )}
@@ -121,7 +134,18 @@ const Budget = () => {
 
         {/* 2nd column */}
         <div className="bg-white shadow-md rounded-lg flex flex-col gap-2 px-3 py-6 lg:w-[60%] h-full">
-          <BudgetTable addExpense={addExpense} setAddExpense={setAddExpense} />
+          {budgetSelect ? (
+            <BudgetTable
+              addExpense={addExpense}
+              setAddExpense={setAddExpense}
+              currentFolder={currentFolder}
+              setCurrentFolder={setCurrentFolder}
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center">
+              <NoEntries />
+            </div>
+          )}
         </div>
       </div>
     </div>

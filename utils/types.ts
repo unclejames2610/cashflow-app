@@ -2,7 +2,7 @@ export interface Expense {
   category: string;
   amount: string;
   description: string;
-  date: Date;
+  date: string;
 }
 
 export interface BudgetModel {

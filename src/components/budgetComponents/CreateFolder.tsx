@@ -62,7 +62,7 @@ const CreateFolder: FC<CreateFolderProps> = ({
             income: income,
             month: month,
             date: new Date().toString(),
-            expenses: [],
+            expense: [],
           });
           setSuccess(true);
           setLoading(false);
