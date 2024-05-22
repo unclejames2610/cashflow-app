@@ -5,72 +5,139 @@ import Image from "next/image";
 import React, { Dispatch, FC, SetStateAction, useState } from "react";
 import { FaX } from "react-icons/fa6";
 import correct from "../../../public/assets/correct.png";
-import { BudgetModel } from "../../../utils/types";
+import { BudgetModel, Expense } from "../../../utils/types";
 import BasicButton from "../BasicButton";
 import Loader from "../Loader";
 import LoginInput from "../LoginInput";
-import { v4 as uuidv4 } from "uuid";
 
-interface AddExpenseProps {
-  addExpense: boolean;
-  setAddExpense: Dispatch<SetStateAction<boolean>>;
+interface EditExpenseProps {
+  editExpense: boolean;
+  setEditExpense: Dispatch<SetStateAction<boolean>>;
   success: boolean;
   setSuccess: Dispatch<SetStateAction<boolean>>;
   budgetName: string;
   setCurrentFolder: Dispatch<SetStateAction<BudgetModel | undefined>>;
+  currentFolder: BudgetModel | undefined;
+  setCurrentExpense: Dispatch<SetStateAction<Expense | undefined>>;
+  currentExpense: Expense | undefined;
 }
 
-const AddExpense: FC<AddExpenseProps> = ({
-  addExpense,
-  setAddExpense,
+const EditExpense: FC<EditExpenseProps> = ({
+  editExpense,
+  setEditExpense,
   success,
   setSuccess,
   budgetName,
   setCurrentFolder,
+  currentFolder,
+  currentExpense,
+  setCurrentExpense,
 }) => {
   const [error, setError] = useState(false);
   const [emptyError, setEmptyError] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [category, setCategory] = useState("");
-  const [amount, setAmount] = useState("");
-  const [description, setDescription] = useState("");
-  const [date, setDate] = useState("");
+  const [category, setCategory] = useState(currentExpense?.category);
+  const [amount, setAmount] = useState(currentExpense?.amount);
+  const [description, setDescription] = useState(currentExpense?.description);
+  const [date, setDate] = useState(currentExpense?.description);
+
+  //   console.log(currentExpense);
 
   const onSubmit = async () => {
     setLoading(true);
     setError(false);
     setEmptyError(false);
     if (
-      category.length === 0 ||
-      amount.length === 0 ||
-      description.length === 0 ||
-      date.length === 0
+      category?.length === 0 ||
+      amount?.length === 0 ||
+      description?.length === 0 ||
+      date?.length === 0
     ) {
       setEmptyError(true);
     } else {
       try {
         const docRef = doc(db, "budgetFolder", budgetName);
         const res = await getDoc(docRef);
+        const updatedExpense = {
+          id: currentExpense?.id,
+          category: category,
+          amount: amount,
+          description: description,
+          date: date,
+        };
         if (res.exists()) {
-          await updateDoc(docRef, {
-            expense: arrayUnion({
-              id: uuidv4(),
-              category: category,
-              amount: amount,
-              description: description,
-              date: date,
-            }),
-          });
+          const folderData = res.data() as BudgetModel;
+          const expenseIndex = folderData?.expense?.findIndex(
+            (expense) => expense.id === currentExpense?.id // Match the expense ID
+          );
+          if (folderData?.expense) {
+            const filteredExpenses = folderData.expense.filter(
+              (expense) => expense.id !== currentExpense?.id // Exclude the expense to update
+            );
+
+            // Update the document with the filtered array and the updated expense
+            await updateDoc(docRef, {
+              expense: [...filteredExpenses, updatedExpense],
+            });
+          } else {
+            console.error("Expense to update not found");
+          }
+          //   await updateDoc(docRef, {
+          //     expense: arrayUnion({
+          //       category: category,
+          //       amount: amount,
+          //       description: description,
+          //       date: date,
+          //     }),
+          //   });
           setSuccess(true);
 
           // After successful update, fetch the updated document to ensure currentFolder reflects the change
           const updatedDocSnap = await getDoc(docRef);
           const updatedFolderData = updatedDocSnap.data() as BudgetModel;
           setCurrentFolder(updatedFolderData);
+          setLoading(false);
         }
       } catch (error) {
         console.log(error);
+        setLoading(false);
       }
+    }
+  };
+
+  const onDelete = async () => {
+    setLoading(true);
+    setError(false);
+    try {
+      const docRef = doc(db, "budgetFolder", budgetName);
+
+      // Fetch the current folder data
+      const folderSnap = await getDoc(docRef);
+      const folderData = folderSnap.data() as BudgetModel;
+
+      if (folderData?.expense) {
+        const filteredExpenses = folderData.expense.filter(
+          (expense) => expense.id !== currentExpense?.id // Exclude the expense to delete
+        );
+
+        // Update the document with the filtered array (excluding the expense)
+        await updateDoc(docRef, {
+          expense: filteredExpenses,
+        });
+        setSuccess(true);
+
+        // After successful update, fetch the updated document to ensure currentFolder reflects the change
+        const updatedDocSnap = await getDoc(docRef);
+        const updatedFolderData = updatedDocSnap.data() as BudgetModel;
+        setCurrentFolder(updatedFolderData);
+        setLoading(false);
+      } else {
+        console.error("Expense data not found in the document");
+      }
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
     }
   };
 
@@ -84,7 +151,7 @@ const AddExpense: FC<AddExpenseProps> = ({
             <div
               className="p-2 rounded-full bg-gray-200 cursor-pointer"
               onClick={() => {
-                setAddExpense(false);
+                setEditExpense(false);
                 setSuccess(false);
               }}
             >
@@ -105,7 +172,7 @@ const AddExpense: FC<AddExpenseProps> = ({
 
           <div className="flex flex-col gap-4 items-center text-center">
             <h5 className="font-semibold text-lg md:text-xl text-primary-black text-center">
-              Expense Added Successfully
+              Expense Edited Successfully
             </h5>
           </div>
         </div>
@@ -115,12 +182,12 @@ const AddExpense: FC<AddExpenseProps> = ({
             <div className="flex w-full justify-between mb-6 gap-6">
               {/* header */}
               <h4 className=" text-lg md:text:2xl text-primary-green font-semibold">
-                Add Expense
+                Edit Expense
               </h4>
               <span
                 className="p-2 rounded-full bg-gray-200 cursor-pointer"
                 onClick={() => {
-                  setAddExpense(false);
+                  setEditExpense(false);
                 }}
               >
                 <FaX className="text-gray-400 text-xs" />
@@ -137,7 +204,7 @@ const AddExpense: FC<AddExpenseProps> = ({
             label="Category"
             placeholder="Enter Category"
             name="category"
-            value={category}
+            value={category!!}
             onChange={(e) => setCategory(e.target.value)}
           />
 
@@ -146,7 +213,7 @@ const AddExpense: FC<AddExpenseProps> = ({
             label="Amount"
             placeholder="Enter Amount"
             name="amount"
-            value={amount}
+            value={amount!!}
             onChange={(e) => setAmount(e.target.value)}
             pattern="[0-9]*"
           />
@@ -156,7 +223,7 @@ const AddExpense: FC<AddExpenseProps> = ({
             label="Description"
             placeholder="Enter Description"
             name="description"
-            value={description}
+            value={description!!}
             onChange={(e) => setDescription(e.target.value)}
           />
 
@@ -165,14 +232,14 @@ const AddExpense: FC<AddExpenseProps> = ({
             label="Date"
             placeholder="Enter Date"
             name="expenseDate"
-            value={date}
+            value={date!!}
             onChange={(e) => setDate(e.target.value)}
           />
 
           {error === true && (
             <div className="flex items-center justify-center h-full -mt-4 w-full">
               <p className="text-sm text-center text-error-red mt-4">
-                An error occured, could not create folder
+                An error occured, could not edit expense
               </p>
             </div>
           )}
@@ -190,8 +257,13 @@ const AddExpense: FC<AddExpenseProps> = ({
               <Loader />
             </div>
           ) : (
-            <div className="w-full mt-4 mx-auto flex justify-center">
-              <BasicButton text="Add" onClick={() => onSubmit()} />
+            <div className="w-full mt-4 mx-auto flex justify-between items-center gap-8">
+              <BasicButton text="Edit" onClick={() => onSubmit()} />
+              <BasicButton
+                text="Delete"
+                onClick={() => onDelete()}
+                deleteBtn={true}
+              />
             </div>
           )}
         </div>
@@ -200,4 +272,4 @@ const AddExpense: FC<AddExpenseProps> = ({
   );
 };
 
-export default AddExpense;
+export default EditExpense;

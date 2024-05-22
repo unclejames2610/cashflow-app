@@ -12,20 +12,24 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
-import { BudgetModel } from "../../utils/types";
+import { BudgetModel, Expense } from "../../utils/types";
 import { formatDateAndTime } from "../../utils/helperMethods";
 import NoEntries from "@/components/NoEntries";
+import EditExpense from "@/components/budgetComponents/EditExpense";
 
 const Budget = () => {
   const [month, setMonth] = useState("April");
   const [createFolderActive, setCreateFolderActive] = useState(false);
   const [success, setSuccess] = useState(false);
   const [addExpense, setAddExpense] = useState(false);
+  const [editExpense, setEditExpense] = useState(false);
   const [currentFolder, setCurrentFolder] = useState<BudgetModel | undefined>();
 
   const [budgetFolders, setBudgetFolders] = useState<BudgetModel[] | undefined>(
     []
   );
+
+  const [currentExpense, setCurrentExpense] = useState<Expense | undefined>();
 
   const [budgetSelect, setBudgetSelect] = useState<boolean>(false);
   const [budgetName, setBudgetName] = useState<string>("");
@@ -36,7 +40,7 @@ const Budget = () => {
       const fetchedFolders: BudgetModel[] = [];
       querySnapshot.forEach((doc) => {
         // doc.data() is never undefined for query doc snapshots
-        console.log(doc.data());
+        // console.log(doc.data());
         fetchedFolders.push(doc.data() as BudgetModel);
       });
       setBudgetFolders(fetchedFolders);
@@ -45,8 +49,8 @@ const Budget = () => {
     fetchBudget();
   }, [success]);
 
-  console.log("success", success);
-  console.log(currentFolder);
+  // console.log("success", success);
+  // console.log(currentFolder);
   return (
     <div className="flex flex-col min-h-screen gap-4 mx-auto  bg-background relative">
       {createFolderActive && (
@@ -77,6 +81,26 @@ const Budget = () => {
             setSuccess={setSuccess}
             success={success}
             setCurrentFolder={setCurrentFolder}
+          />
+        </div>
+      )}
+
+      {editExpense && (
+        <div className="w-full h-full absolute bg-black/40 z-10"></div>
+      )}
+
+      {editExpense && (
+        <div className="absolute z-20 inset-0 flex mt-4">
+          <EditExpense
+            budgetName={budgetName}
+            editExpense={editExpense}
+            setEditExpense={setEditExpense}
+            setSuccess={setSuccess}
+            success={success}
+            currentFolder={currentFolder}
+            setCurrentFolder={setCurrentFolder}
+            currentExpense={currentExpense}
+            setCurrentExpense={setCurrentExpense}
           />
         </div>
       )}
@@ -140,6 +164,9 @@ const Budget = () => {
               setAddExpense={setAddExpense}
               currentFolder={currentFolder}
               setCurrentFolder={setCurrentFolder}
+              setEditExpense={setEditExpense}
+              setCurrentExpense={setCurrentExpense}
+              currentExpense={currentExpense}
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center">

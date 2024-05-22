@@ -4,10 +4,13 @@ const BasicButton: FC<{
   text: string;
   notFull?: boolean;
   onClick?: MouseEventHandler<HTMLButtonElement>;
-}> = ({ text, notFull, onClick }) => {
+  deleteBtn?: boolean;
+}> = ({ text, notFull, onClick, deleteBtn }) => {
   return (
     <button
-      className={`text-white bg-primary-green p-3 text-xs md:text-sm rounded-md shadow-md ${
+      className={` ${
+        deleteBtn ? "bg-red-100 text-red-600" : "bg-primary-green text-white"
+      }  p-3 text-xs md:text-sm rounded-md shadow-md ${
         notFull ? "" : "w-full"
       }  lg:w-36`}
       onClick={onClick}
