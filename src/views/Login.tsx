@@ -13,6 +13,7 @@ import {
 } from "firebase/auth";
 import { app } from "@/config/firebaseConfig";
 import { useRouter } from "next/navigation";
+import LoaderSmall from "@/components/LoaderSmall";
 
 const Login = () => {
   const [email, setEmail] = useState<string>("");
@@ -160,7 +161,10 @@ const Login = () => {
               label="Password"
             />
 
-            <Button text="Login" type="submit" />
+            <Button
+              text={loading ? <LoaderSmall /> : "Sign In"}
+              type="submit"
+            />
           </form>
 
           <div className="text-gray-500 ">

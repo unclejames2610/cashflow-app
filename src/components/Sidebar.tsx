@@ -1,11 +1,15 @@
 "use client";
 import Link from "next/link";
-import React, { FC, useState } from "react";
+import React, { Dispatch, FC, SetStateAction, useState } from "react";
 import { LuLayoutDashboard } from "react-icons/lu";
 import { MdOutlineAccountBalanceWallet, MdOutlineLogout } from "react-icons/md";
 import { TbClipboardText } from "react-icons/tb";
 import { VscSettingsGear } from "react-icons/vsc";
-const Sidebar: FC<{ pathname: string }> = ({ pathname }) => {
+const Sidebar: FC<{
+  pathname: string;
+  logoutActive: boolean;
+  setLogoutActive: Dispatch<SetStateAction<boolean>>;
+}> = ({ pathname, logoutActive, setLogoutActive }) => {
   const navItems1 = [
     {
       name: "Dashboard",
@@ -24,7 +28,6 @@ const Sidebar: FC<{ pathname: string }> = ({ pathname }) => {
     },
   ];
 
-  const [logoutActive, setLogoutActive] = useState(false);
   return (
     <aside className="hidden lg:flex flex-col w-56 h-[calc(100vh-64px)]  overflow-y-auto justify-between gap-6 bg-white shadow-md">
       <ul className="flex flex-col gap-2 py-4 px-5 h-full">
