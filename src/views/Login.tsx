@@ -48,9 +48,9 @@ const Login = () => {
           // Signed up
           const user = userCredential.user;
           setLoading(false);
-          setEmail("");
+          // setEmail("");
 
-          setPassword("");
+          // setPassword("");
 
           setSuccess(true);
           router.push("/home");

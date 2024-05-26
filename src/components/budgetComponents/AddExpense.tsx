@@ -1,6 +1,14 @@
 "use client";
 import { db } from "@/config/firebaseConfig";
-import { arrayUnion, doc, getDoc, updateDoc } from "firebase/firestore";
+import {
+  addDoc,
+  arrayUnion,
+  collection,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+} from "firebase/firestore";
 import Image from "next/image";
 import React, { Dispatch, FC, SetStateAction, useState } from "react";
 import { FaX } from "react-icons/fa6";
@@ -50,7 +58,9 @@ const AddExpense: FC<AddExpenseProps> = ({
     } else {
       try {
         const docRef = doc(db, "budgetFolder", budgetName);
+        const docRef2 = doc(db, "category", "allCategories");
         const res = await getDoc(docRef);
+        const res2 = await getDoc(docRef2);
         if (res.exists()) {
           await updateDoc(docRef, {
             expense: arrayUnion({
@@ -61,7 +71,23 @@ const AddExpense: FC<AddExpenseProps> = ({
               date: date,
             }),
           });
-          setSuccess(true);
+
+          // await setDoc(doc(db, "category", "allCategories"), {
+          //   expenses: [],
+          // });
+
+          if (res2.exists()) {
+            await updateDoc(docRef2, {
+              expense: arrayUnion({
+                id: uuidv4(),
+                category: category,
+                amount: amount,
+                description: description,
+                date: date,
+              }),
+            });
+            setSuccess(true);
+          }
 
           // After successful update, fetch the updated document to ensure currentFolder reflects the change
           const updatedDocSnap = await getDoc(docRef);
