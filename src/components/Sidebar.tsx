@@ -60,7 +60,17 @@ const Sidebar: FC<{
           <span className="">Settings</span>
         </Link>
 
-        <div
+        <Link
+          href="/"
+          className={`px-4 py-2 rounded flex gap-2 cursor-pointer hover:bg-primary-green group text-red-600 hover:text-white font-semibold items-center `}
+        >
+          <span>
+            <MdOutlineLogout className="text-2xl" />
+          </span>
+          <span className="">Logout</span>
+        </Link>
+
+        {/* <div
           className={`px-4 py-2 rounded flex gap-2 cursor-pointer hover:bg-primary-green group text-red-600 hover:text-white font-semibold items-center ${
             logoutActive === true ? "bg-primary-green text-white" : ""
           }`}
@@ -70,7 +80,7 @@ const Sidebar: FC<{
             <MdOutlineLogout className="text-2xl" />
           </span>
           <span className="">Logout</span>
-        </div>
+        </div> */}
       </div>
     </aside>
   );
