@@ -47,7 +47,8 @@ const Login = () => {
         .then((userCredential) => {
           // Signed up
           const user = userCredential.user;
-          setLoading(false);
+          console.log(user);
+          // setLoading(false);
           // setEmail("");
 
           // setPassword("");

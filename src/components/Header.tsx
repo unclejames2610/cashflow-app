@@ -36,7 +36,7 @@ const Header: FC<HeaderProps> = ({ setmenuActive }) => {
         </div>
 
         {/* search */}
-        <div className="lg:flex gap-2 p-2 rounded-lg border border-gray-300 bg-white items-center hidden">
+        {/* <div className="lg:flex gap-2 p-2 rounded-lg border border-gray-300 bg-white items-center hidden">
           <span>
             <RiSearchEyeLine className="text-lg text-gray-400" />
           </span>
@@ -47,7 +47,7 @@ const Header: FC<HeaderProps> = ({ setmenuActive }) => {
             onChange={handleSearch}
             name="search"
           />
-        </div>
+        </div> */}
       </div>
 
       <div className="flex items-center gap-2 lg:gap-4">
