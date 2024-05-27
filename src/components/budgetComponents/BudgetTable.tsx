@@ -147,7 +147,7 @@ const BudgetTable: FC<BudgetTableProps> = ({
                 </tr>
               </thead>
               <tbody>
-                {currentRows?.map((budget, index) => (
+                {currentRows?.reverse()?.map((budget, index) => (
                   <tr
                     key={index}
                     className={`border-b-[0.5px] border-gray-500 hover:bg-primary-green/15 text-sm text-primary-black cursor-pointer `}

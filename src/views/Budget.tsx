@@ -16,6 +16,7 @@ import { BudgetModel, Expense } from "../../utils/types";
 import { formatDateAndTime } from "../../utils/helperMethods";
 import NoEntries from "@/components/NoEntries";
 import EditExpense from "@/components/budgetComponents/EditExpense";
+import Loader from "@/components/Loader";
 
 const Budget = () => {
   const [month, setMonth] = useState("April");
@@ -33,6 +34,7 @@ const Budget = () => {
 
   const [budgetSelect, setBudgetSelect] = useState<boolean>(false);
   const [budgetName, setBudgetName] = useState<string>("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchBudget = async () => {
@@ -44,13 +46,33 @@ const Budget = () => {
         fetchedFolders.push(doc.data() as BudgetModel);
       });
       setBudgetFolders(fetchedFolders);
+      setLoading(false);
     };
 
     fetchBudget();
   }, [success]);
 
+  useEffect(() => {
+    if (
+      createFolderActive === true ||
+      success === true ||
+      addExpense === true ||
+      editExpense
+    ) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [createFolderActive, success, addExpense, editExpense]);
+
   // console.log("success", success);
   // console.log(currentFolder);
+  if (loading) {
+    return (
+      <div className="flex flex-col mx-auto h-screen items-center justify-center">
+        <Loader />
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col min-h-screen gap-4 mx-auto  bg-background relative">
       {createFolderActive && (
@@ -110,7 +132,7 @@ const Budget = () => {
           Budget
         </h4>
 
-        <select
+        {/* <select
           className="border px-4 py-2 rounded-md border-gray-400 outline-none  w-fit bg-transparent focus:outline-none"
           value={month}
           onChange={(e) => setMonth(e.target.value)}
@@ -120,7 +142,7 @@ const Budget = () => {
               {value}
             </option>
           ))}
-        </select>
+        </select> */}
       </div>
 
       <div className="flex gap-6 lg:justify-between lg:flex-row flex-col lg:h-[600px] p-4">
