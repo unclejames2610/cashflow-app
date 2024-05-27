@@ -5,7 +5,7 @@ import correct from "../../../public/assets/correct.png";
 import BasicButton from "../BasicButton";
 import Loader from "../Loader";
 import LoginInput from "../LoginInput";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
 
 interface EnterIncomeProps {
@@ -64,6 +64,13 @@ const EnterIncome: FC<EnterIncomeProps> = ({
             date: new Date().toString(),
             expense: [],
           });
+          setSuccess(true);
+          setLoading(false);
+        } else {
+          await updateDoc(doc(db, "income", date), {
+            income: income,
+          });
+
           setSuccess(true);
           setLoading(false);
         }
