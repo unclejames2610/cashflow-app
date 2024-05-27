@@ -1,23 +1,19 @@
 "use client";
+import Button from "@/components/Button";
+import LoginInput from "@/components/LoginInput";
 import Image from "next/image";
+import Link from "next/link";
 import React, { FormEvent, useState } from "react";
 import logo from "../../public/assets/logo.svg";
-import loginImage from "../../public/assets/loginImage.svg";
-import LoginInput from "@/components/LoginInput";
-import Button from "@/components/Button";
-import Link from "next/link";
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { app } from "@/config/firebaseConfig";
-import { useRouter } from "next/navigation";
 import LoaderSmall from "@/components/LoaderSmall";
 
-const Login = () => {
+const Signup = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [fullname, setFullname] = useState<string>("");
+  const [retypePassword, setRetypePassword] = useState<string>("");
   const [passwordError, setPasswordError] = useState(false);
   const [errorText, setErrorText] = useState<string>("");
   const auth = getAuth(app);
@@ -26,9 +22,7 @@ const Login = () => {
   const [error, setError] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  const router = useRouter();
-
-  const signIn = async (e: FormEvent) => {
+  const signUp = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setPasswordError(false);
@@ -36,26 +30,32 @@ const Login = () => {
     setEmptyError(false);
     setErrorText("");
     setSuccess(false);
-    if (email.length === 0 || password.length === 0) {
+    if (
+      email.length === 0 ||
+      password.length === 0 ||
+      fullname.length === 0 ||
+      retypePassword.length === 0
+    ) {
       setEmptyError(true);
       setErrorText("Please fill in all required fields");
       setLoading(false);
 
       setError(false);
+    } else if (password !== retypePassword) {
+      setPasswordError(true);
+      setErrorText("Passwords do not match");
+      setLoading(false);
     } else {
-      await signInWithEmailAndPassword(auth, email, password)
+      await createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
           // Signed up
           const user = userCredential.user;
-          console.log(user);
-          // setLoading(false);
-          // setEmail("");
-
-          // setPassword("");
-
+          setLoading(false);
+          setEmail("");
+          setFullname("");
+          setPassword("");
+          setRetypePassword("");
           setSuccess(true);
-          router.push("/home");
-
           // ...
         })
         .catch((error) => {
@@ -94,15 +94,15 @@ const Login = () => {
         </div>
         <div className="h-[100%] w-full bg-cover bg-bgImage bg-no-repeat"></div>
         {/* <div className="relative h-full w-full md:h-full md:w-full ">
-          <Image
-            src={loginImage}
-            alt="logo"
-            fill={true}
-            priority
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className="object-contain"
-          />
-        </div> */}
+        <Image
+          src={loginImage}
+          alt="logo"
+          fill={true}
+          priority
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className="object-contain"
+        />
+      </div> */}
       </div>
 
       {/* column two */}
@@ -125,28 +125,40 @@ const Login = () => {
           </p>
         </div>
         <h4 className="font-semibold text-lg md:text-2xl text-primary-green">
-          Welcome Back!
+          Create Account
         </h4>
-        <div className="flex flex-col gap-2">
-          {(error === true || emptyError === true) && (
+        <div className="flex flex-col gap-2 pb-8">
+          {(error === true ||
+            passwordError === true ||
+            emptyError === true) && (
             <p className="text-xs md:text-sm font-medium text-red-600 text-center">
               {errorText}
             </p>
           )}
 
-          {/* {success === true && (
+          {success === true && (
             <p className="text-xs md:text-sm font-medium text-primary-green text-center">
               User Created Successfully
             </p>
-          )} */}
+          )}
           <form
             className="flex flex-col gap-4 w-full lg:w-[350px]"
-            onSubmit={(e) => signIn(e)}
+            onSubmit={(e) => signUp(e)}
           >
+            {/* full name */}
+            <LoginInput
+              name="name"
+              value={fullname}
+              onChange={(e) => setFullname(e.target.value)}
+              placeholder="Enter your name"
+              type="text"
+              label="Full Name"
+            />
+
             {/* email */}
             <LoginInput
               name="email"
-              value={email!!}
+              value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
               type="email"
@@ -155,23 +167,32 @@ const Login = () => {
 
             <LoginInput
               name="password"
-              value={password!!}
+              value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
               type="password"
               label="Password"
             />
 
+            <LoginInput
+              name="retypePassword"
+              value={retypePassword}
+              onChange={(e) => setRetypePassword(e.target.value)}
+              placeholder="Re-enter your password"
+              type="password"
+              label="Re-Type Password"
+            />
+
             <Button
-              text={loading ? <LoaderSmall /> : "Sign In"}
+              text={loading ? <LoaderSmall /> : "Sign Up"}
               type="submit"
             />
           </form>
 
           <div className="text-gray-500 ">
-            Don't Have An Account?{" "}
-            <Link href="/signup" className="text-primary-green hover:underline">
-              Sign up
+            Already Have An Account?{" "}
+            <Link href="/" className="text-primary-green hover:underline">
+              Login
             </Link>
           </div>
         </div>
@@ -180,4 +201,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Signup;

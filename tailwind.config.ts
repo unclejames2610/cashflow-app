@@ -14,6 +14,10 @@ const config: Config = {
       },
       colors: {
         "primary-green": "#107137",
+        "custom-black": "#3A3A3A",
+        "custom-red": "#CE1818",
+        background: "#FBFBFB",
+        "light-green": "#BCD7C7",
       },
     },
   },
