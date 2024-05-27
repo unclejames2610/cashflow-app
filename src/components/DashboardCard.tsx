@@ -1,9 +1,22 @@
 import Image from "next/image";
-import React from "react";
+import React, { FC } from "react";
 import { MdOutlineRemoveRedEye } from "react-icons/md";
 import ellipse from "../../public/assets/ellipse.svg";
+import { formatAmount } from "../../utils/helperMethods";
 
-const DashboardCard = () => {
+interface DashboardCardProps {
+  currentBalance: string;
+  totalIncome: string;
+  totalSpending: string;
+  totalSavings: string;
+}
+
+const DashboardCard: FC<DashboardCardProps> = ({
+  currentBalance,
+  totalIncome,
+  totalSavings,
+  totalSpending,
+}) => {
   return (
     <div className="rounded-lg shadow-md bg-primary-green w-full flex flex-col justify-between lg:h-72 gap-8 text-white relative p-6 overflow-hidden">
       <div className="absolute -right-4 top-0">
@@ -25,21 +38,29 @@ const DashboardCard = () => {
             <MdOutlineRemoveRedEye className="text-lg" />
           </span>
         </div>
-        <h2 className="text-xl md:text-3xl font-bold ">N210,000.00</h2>
+        <h2 className="text-xl md:text-3xl font-bold ">
+          N{formatAmount(Number(currentBalance))}
+        </h2>
       </div>
 
       <div className="flex items-center flex-wrap">
         <div className="flex flex-col gap-2 p-4">
           <h6 className="text-xs md:text-sm text-white/70">Total Income</h6>
-          <h5 className="text-sm md:text-base font-semibold">N210,000.00</h5>
+          <h5 className="text-sm md:text-base font-semibold">
+            N{formatAmount(Number(totalIncome))}
+          </h5>
         </div>
         <div className="flex flex-col gap-2 p-4 border-x-[0.5px] border-white/50">
           <h6 className="text-xs md:text-sm text-white/70">Total Spending</h6>
-          <h5 className="text-sm md:text-base font-semibold">N110,000.00</h5>
+          <h5 className="text-sm md:text-base font-semibold">
+            N{formatAmount(Number(totalSpending))}
+          </h5>
         </div>
         <div className="flex flex-col gap-2 p-4">
           <h6 className="text-xs md:text-sm text-white/70">Total Savings</h6>
-          <h5 className="text-sm md:text-base font-semibold">N90,000.00</h5>
+          <h5 className="text-sm md:text-base font-semibold">
+            N{formatAmount(Number(totalSavings))}
+          </h5>
         </div>
       </div>
     </div>
