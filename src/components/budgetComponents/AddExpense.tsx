@@ -59,8 +59,10 @@ const AddExpense: FC<AddExpenseProps> = ({
       try {
         const docRef = doc(db, "budgetFolder", budgetName);
         const docRef2 = doc(db, "category", "allCategories");
+        const docRef3 = doc(db, "income", date);
         const res = await getDoc(docRef);
         const res2 = await getDoc(docRef2);
+        const res3 = await getDoc(docRef3);
         if (res.exists()) {
           await updateDoc(docRef, {
             expense: arrayUnion({
@@ -86,6 +88,33 @@ const AddExpense: FC<AddExpenseProps> = ({
                 date: date,
               }),
             });
+          }
+
+          if (res3.exists()) {
+            await updateDoc(docRef3, {
+              expense: arrayUnion({
+                id: uuidv4(),
+                category: category,
+                amount: amount,
+                description: description,
+                date: date,
+              }),
+            });
+            setSuccess(true);
+          } else {
+            await setDoc(doc(db, "income", date), {
+              name: date,
+              income: "0",
+              month: "",
+              date: new Date().toString(),
+              expense: arrayUnion({
+                id: uuidv4(),
+                category: category,
+                amount: amount,
+                description: description,
+                date: date,
+              }),
+            });
             setSuccess(true);
           }
 
@@ -99,6 +128,8 @@ const AddExpense: FC<AddExpenseProps> = ({
       }
     }
   };
+
+  console.log(date);
 
   return (
     <div
