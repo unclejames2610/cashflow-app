@@ -12,4 +12,6 @@ export interface BudgetModel {
   month: string;
   income: string;
   expense: Expense[];
+  totalBalance?: string;
+  totalExpense?: string;
 }

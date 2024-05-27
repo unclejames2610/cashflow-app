@@ -1,3 +1,5 @@
+import { Expense } from "./types";
+
 export function formatDateAndTime(dateTimeString: string): string {
   // Create a Date object from the provided date string
   const date = new Date(dateTimeString);
@@ -11,6 +13,23 @@ export function formatDateAndTime(dateTimeString: string): string {
 
   // Concatenate the formatted date and time
   const formattedDate = `${day}/${month}/${year}, ${hours}:${minutes}`;
+
+  return formattedDate;
+}
+
+export function formatMonthAndYear(dateTimeString: string): string {
+  // Create a Date object from the provided date string
+  const date = new Date(dateTimeString);
+
+  // Extract day, month, year, hours, and minutes from the Date object
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+  const year = date.getFullYear();
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+
+  // Concatenate the formatted date and time
+  const formattedDate = `${month}, ${year}`;
 
   return formattedDate;
 }
@@ -128,4 +147,19 @@ export const convertTimestampToLocalDateString = (
 
 export const formatAmount = (amount: number): string => {
   return amount?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+};
+
+export const calculateTotalExpense = (expenses: Expense[]): string => {
+  let total = 0;
+  expenses.forEach((expense) => {
+    total += parseFloat(expense.amount);
+  });
+  return total.toString(); // convert total to string for consistency
+};
+
+export const calculateBalance = (
+  income: string,
+  totalExpense: string
+): string => {
+  return (parseFloat(income) - parseFloat(totalExpense)).toString();
 };
